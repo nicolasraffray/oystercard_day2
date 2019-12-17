@@ -75,6 +75,7 @@ describe Oystercard do
     end
 
     it "store start and end" do
+      p subject.journeys
       expect(subject.journeys).to eq([{start: station, end: exit_station}])
     end
   end
