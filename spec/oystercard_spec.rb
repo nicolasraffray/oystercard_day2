@@ -6,6 +6,10 @@ describe Oystercard do
     it "has a balance of 0 by default" do
       expect(subject.balance).to eq(0)
     end
+
+    it "initializes with empty journeys list" do
+      expect(subject.journeys).to be_empty
+    end
   end
 
   describe "#topup" do
@@ -27,46 +31,51 @@ describe Oystercard do
   describe "#touch_in" do
     let(:station){double :station}
 
-    it "saves station" do
+    before(:each) do
       subject.top_up(Oystercard::MIN)
       subject.touch_in(station)
+    end
+
+    it "raises_error insufficient funds" do
+      card = Oystercard.new
+      expect { card.touch_in(station) }.to raise_error "insufficent funds"
+    end
+
+    it "saves station" do
       expect(subject.entry_station).to eq station
     end
 
-
     it "registers start of journey" do
-      subject.top_up(Oystercard::MIN)
-      subject.touch_in(station)
       expect(subject).to be_in_journey
-    end
-
-
-    it "raises_error insufficient funds" do
-      expect { subject.touch_in(station) }.to raise_error "insufficent funds"
     end
   end
 
   describe "#touch_out" do
     let(:station){double :station}
+    let(:exit_station){double :exit_station}
 
-    it "registers end of journey" do
+    before(:each) do
       subject.top_up(Oystercard::MIN)
       subject.touch_in(station)
-      subject.touch_out
-      expect(subject).to_not be_in_journey
-    end
-
-    it 'reset entry station' do
-      subject.top_up(Oystercard::MIN)
-      subject.touch_in(station)
-      subject.touch_out
-      expect(subject.entry_station).to eq nil
+      subject.touch_out(exit_station)
     end
 
     it "deducts fare" do
       subject.top_up(20)
       subject.touch_in(station)
-      expect{subject.touch_out}.to change{ subject.balance}.by(-Oystercard::MIN)
+      expect{subject.touch_out(exit_station)}.to change{ subject.balance}.by(-Oystercard::MIN)
+    end
+
+    it "registers end of journey" do
+      expect(subject).to_not be_in_journey
+    end
+
+    it 'reset entry station' do
+      expect(subject.entry_station).to eq nil
+    end
+
+    it "store start and end" do
+      expect(subject.journeys).to eq([{start: station, end: exit_station}])
     end
   end
 
