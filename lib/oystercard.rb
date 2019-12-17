@@ -4,6 +4,7 @@ class Oystercard
   attr_accessor :in_journey
 
   MAX_CAP = 90
+  MIN = 1
 
 
   def initialize
@@ -16,12 +17,12 @@ class Oystercard
     @balance += money
   end
 
-  def pay(fare)
+  def deduct(fare)
     @balance -= fare
   end
 
   def touch_in
-    fail "insufficent funds" if @balance < 1
+    fail "insufficent funds" if @balance < MIN
     @in_journey = true
     @in_journey
   end
