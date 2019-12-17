@@ -9,10 +9,10 @@ describe Oystercard do
   end
 
   describe "#topup" do
-    
+
     context "add money" do
       it { is_expected .to respond_to(:top_up).with(1).argument }
-    
+
       it "adds 5 money to the balance" do
         subject.top_up(5)
         expect(subject.balance).to eq(5)
@@ -32,4 +32,24 @@ describe Oystercard do
     it { expect{ subject.pay(1) }.to change{ subject.balance }.by -1 }
   end
 
+  describe "#touch_in" do
+    it "registers start of journey" do
+      subject.touch_in
+      expect(subject).to be_in_journey
+    end
+  end
+
+  describe "#touch_out" do
+    it "regiesters end of journey" do
+      subject.touch_in
+      subject.touch_out
+      expect(subject).to_not be_in_journey
+    end
+  end
+
+  describe "#in_journey?" do
+    it "initially not in journey" do
+      expect(subject).not_to be_in_journey
+    end
+  end
 end
