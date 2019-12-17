@@ -9,21 +9,18 @@ describe Oystercard do
   end
 
   describe "#topup" do
+    it { is_expected .to respond_to(:top_up).with(1).argument }
 
-    context "add money" do
-      it { is_expected .to respond_to(:top_up).with(1).argument }
+    it "adds 5 money to the balance" do
+      subject.top_up(5)
+      expect(subject.balance).to eq(5)
+    # it {expect{ subject.top_up 1 }.to change{ subject.balance }.by 1}
+    end
 
-      it "adds 5 money to the balance" do
-        subject.top_up(5)
-        expect(subject.balance).to eq(5)
-      # it {expect{ subject.top_up 1 }.to change{ subject.balance }.by 1}
-      end
-
-      it "has a limit of 90" do
-        max_cap = Oystercard::MAX_CAP
-        subject.top_up(max_cap)
-        expect { subject.top_up(1) }.to raise_error "Maximum limit of #{max_cap} reached"
-      end
+    it "has a limit of 90" do
+      max_cap = Oystercard::MAX_CAP
+      subject.top_up(max_cap)
+      expect { subject.top_up(1) }.to raise_error "Maximum limit of #{max_cap} reached"
     end
   end
 
@@ -34,13 +31,19 @@ describe Oystercard do
 
   describe "#touch_in" do
     it "registers start of journey" do
+      subject.top_up(1)
       subject.touch_in
       expect(subject).to be_in_journey
+    end
+
+    it "raises_error insufficient funds" do
+      expect { subject.touch_in }.to raise_error "insufficent funds"
     end
   end
 
   describe "#touch_out" do
     it "regiesters end of journey" do
+      subject.top_up(1)
       subject.touch_in
       subject.touch_out
       expect(subject).to_not be_in_journey
