@@ -30,6 +30,7 @@ describe Oystercard do
 
   describe "#touch_in" do
     let(:station){double :station}
+    #journey = double("journey", :initialize => )
 
     before(:each) do
       subject.top_up(Oystercard::MIN)
@@ -42,7 +43,8 @@ describe Oystercard do
     end
 
     it "saves station" do
-      expect(subject.entry_station).to eq station
+      subject.touch_in(station)
+      expect(subject.journeys.last.start).to eq station
     end
 
     it "registers start of journey" do

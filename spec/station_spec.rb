@@ -4,7 +4,7 @@ describe Station do
 
   describe '#initialize' do
 
-    subject{described_class.new( "Bank", 1)}
+    subject = described_class.new( "Bank", 1)
     # ^these had symbols
 
     it "gives zone" do
