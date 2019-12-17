@@ -9,7 +9,7 @@ describe Oystercard do
   end
 
   describe "#topup" do
-    it { is_expected .to respond_to(:top_up).with(Oystercard::MIN).argument }
+    it { is_expected .to respond_to(:top_up).with(1).argument }
 
     it "adds 5 money to the balance" do
       subject.top_up(5)
@@ -22,11 +22,6 @@ describe Oystercard do
       subject.top_up(max_cap)
       expect { subject.top_up(Oystercard::MIN) }.to raise_error "Maximum limit of #{max_cap} reached"
     end
-  end
-
-  describe "#deduct" do
-    it { is_expected .to respond_to(:deduct).with(Oystercard::MIN).argument }
-    it { expect{ subject.deduct(Oystercard::MIN) }.to change{ subject.balance }.by -Oystercard::MIN }
   end
 
   describe "#touch_in" do
@@ -42,11 +37,17 @@ describe Oystercard do
   end
 
   describe "#touch_out" do
-    it "regiesters end of journey" do
+    it "registers end of journey" do
       subject.top_up(Oystercard::MIN)
       subject.touch_in
       subject.touch_out
       expect(subject).to_not be_in_journey
+    end
+
+    it "deducts fare" do
+      subject.top_up(20)
+      subject.touch_in
+      expect{subject.touch_out}.to change{ subject.balance}.by(-Oystercard::MIN)
     end
   end
 

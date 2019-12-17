@@ -1,7 +1,7 @@
 class Oystercard
 
-  attr_accessor :balance
-  attr_accessor :in_journey
+  attr_accessor :balance, :in_journey
+  attr_reader :deduct
 
   MAX_CAP = 90
   MIN = 1
@@ -17,14 +17,9 @@ class Oystercard
     @balance += money
   end
 
-  def deduct(fare)
-    @balance -= fare
-  end
-
   def touch_in
     fail "insufficent funds" if @balance < MIN
     @in_journey = true
-    @in_journey
   end
 
   def in_journey?
@@ -32,7 +27,13 @@ class Oystercard
   end
 
   def touch_out
+    deduct(MIN)
     @in_journey = false
-    @in_journey
+  end
+
+  private
+
+  def deduct(fare)
+    @balance -= fare
   end
 end
