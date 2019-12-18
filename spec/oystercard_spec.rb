@@ -42,7 +42,7 @@ describe Oystercard do
       subject.touch_in(station)
       expect{subject.touch_out}.to change{subject.balance}.by(-Oystercard::PENALTYFARE)
     end
-    
+
   end
 
   describe "#touch_in" do
@@ -83,14 +83,6 @@ describe Oystercard do
     it "tells current_journey exit station" do
       expect(subject.instance_variable_get(:@current_journey)).to receive(:end_journey).with(exit_station)
       subject.touch_out(exit_station)
-    end
-
-    it "checks journey objects being stored" do
-      expect(subject.journey_log).to all(be_a(Journey))
-    end
-
-    it "creates a new journey object at end" do
-      expect{subject.touch_out(station)}.to change{subject.current_journey.object_id}.from(subject.current_journey.object_id)
     end
   end
 end
