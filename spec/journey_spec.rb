@@ -7,7 +7,13 @@ describe Journey do
   describe "#initialize" do
 
     it "gives us a start station" do
-      subject = described_class.new(station)
+      expect(subject.start).to eq nil
+    end
+  end
+
+  describe "#start_journey" do
+    it "sets start station" do
+      subject.start_journey(station)
       expect(subject.start).to eq station
     end
   end
@@ -15,7 +21,6 @@ describe Journey do
   describe "#end_journey" do
 
     it "sets exit station" do
-      subject = described_class.new(station)
       subject.end_journey(station2)
       expect(subject.end).to eq station2
     end
@@ -23,23 +28,14 @@ describe Journey do
 
   describe "complete?" do
     it "returns true if journey complete" do
-      subject = described_class.new(station)
+      subject.start_journey(station)
       subject.end_journey(station2)
-
       expect(subject.complete?).to be(true)
 
     end
 
     it "returns false if journey is missing start" do
-      subject = described_class.new
       subject.end_journey(station2)
-
-      expect(subject.complete?).to be(false)
-    end
-
-    it "returns false if journey missing end" do
-      subject = described_class.new(station)
-
       expect(subject.complete?).to be(false)
     end
   end

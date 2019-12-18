@@ -8,7 +8,7 @@ describe Oystercard do
     end
 
     it "initializes with empty journeys list" do
-      expect(subject.journeys).to be_empty
+      expect(subject.journey_log).to be_empty
     end
   end
 
@@ -28,9 +28,25 @@ describe Oystercard do
     end
   end
 
+  describe "PENALTYFARE action" do
+    let(:exit_station){double :exit_station}
+    let(:station){double :station}
+
+    it  "deducts if no station on touch in" do
+      subject.top_up(Oystercard::MIN)
+      expect{subject.touch_out(exit_station)}.to change{subject.balance}.by(-Oystercard::PENALTYFARE)
+    end
+
+    it "charges penalty fare for no touch out" do
+      subject.top_up(Oystercard::MIN)
+      subject.touch_in(station)
+      expect{subject.touch_out}.to change{subject.balance}.by(-Oystercard::PENALTYFARE)
+    end
+    
+  end
+
   describe "#touch_in" do
     let(:station){double :station}
-    #journey = double("journey", :initialize => )
 
     before(:each) do
       subject.top_up(Oystercard::MIN)
@@ -43,12 +59,8 @@ describe Oystercard do
     end
 
     it "saves station" do
+      expect(subject.instance_variable_get(:@current_journey)).to receive(:start_journey).with(station)
       subject.touch_in(station)
-      expect(subject.journeys.last.start).to eq station
-    end
-
-    it "registers start of journey" do
-      expect(subject).to be_in_journey
     end
   end
 
@@ -68,30 +80,17 @@ describe Oystercard do
       expect{subject.touch_out(exit_station)}.to change{ subject.balance}.by(-Oystercard::MIN)
     end
 
-    it "registers end of journey" do
-      expect(subject).to_not be_in_journey
+    it "tells current_journey exit station" do
+      expect(subject.instance_variable_get(:@current_journey)).to receive(:end_journey).with(exit_station)
+      subject.touch_out(exit_station)
     end
 
-    it 'reset entry station' do
-      expect(subject.entry_station).to eq nil
+    it "checks journey objects being stored" do
+      expect(subject.journey_log).to all(be_a(Journey))
     end
 
-    it "store start and end" do
-      p subject.journeys
-      expect(subject.journeys).to eq([{start: station, end: exit_station}])
-    end
-  end
-
-  describe "#in_journey?" do
-    let(:station){double :station}
-    it "initially not in journey" do
-      expect(subject).not_to be_in_journey
-    end
-
-    it "returns true when in journey" do
-      subject.top_up(Oystercard::MIN)
-      subject.touch_in(station)
-      expect(subject.in_journey?).to eq true
+    it "creates a new journey object at end" do
+      expect{subject.touch_out(station)}.to change{subject.current_journey.object_id}.from(subject.current_journey.object_id)
     end
   end
 end
