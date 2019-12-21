@@ -25,11 +25,11 @@ describe Journey do
       expect(subject.end).to eq station2
     end
 
-    it "checks journey objects being stored" do
-      subject.start_journey(station)
-      subject.end_journey(station2)
-      expect(subject.journey_log).to all(be_a(Journey))
-    end
+    # it "checks journey objects being stored" do
+    #   subject.start_journey(station)
+    #   subject.end_journey(station2)
+    #   expect(subject.journey_log).to all(be_a(Journey))
+    # end
   end
 
   describe "complete?" do
